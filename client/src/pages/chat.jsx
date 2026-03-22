@@ -5,6 +5,8 @@ function ChatPage({
   error,
   isSending,
   messages,
+  onBack,
+  onDismissError,
   onNewInquiry,
   onResetConversation,
   onSendMessage,
@@ -20,6 +22,7 @@ function ChatPage({
       : discipline.house.includes('Targaryen')
         ? '🐉'
         : '🦌'
+  const lastUserMessage = messages.filter((message) => message.role === 'user').at(-1)
 
   function handleSubmit(event) {
     event.preventDefault()
@@ -83,6 +86,9 @@ function ChatPage({
 
       <section className="chat-main">
         <header className="chat-header">
+          <button className="route-back-button chat-back-button" type="button" onClick={onBack}>
+            Back
+          </button>
           <h1>The Citadel&apos;s Ledger</h1>
           <div className="chat-top-actions">
             <span>⌲</span>
@@ -139,12 +145,40 @@ function ChatPage({
 
                 {isSending ? (
                   <article className="message-bubble message-assistant message-pending">
-                    <p>He scratches at the parchment...</p>
+                    <div className="message-pending-head">
+                      <span className="message-pending-title">Grand Maester Pycelle</span>
+                      <span className="message-pending-runes" aria-hidden="true">
+                        <span />
+                        <span />
+                        <span />
+                      </span>
+                    </div>
+                    <p>He scratches at the parchment, weighing your inquiry against the annals of the realm.</p>
                   </article>
                 ) : null}
               </div>
 
-              {error ? <p className="chat-error">{error}</p> : null}
+              {error ? (
+                <section className="chat-notice chat-notice-error" role="alert" aria-live="assertive">
+                  <div>
+                    <p className="chat-notice-kicker">Raven Lost</p>
+                    <h3>The message never reached the rookery.</h3>
+                    <p className="chat-error">{error}</p>
+                  </div>
+                  <button type="button" className="chat-notice-button" onClick={onDismissError}>
+                    Dismiss
+                  </button>
+                </section>
+              ) : null}
+
+              {isSending ? (
+                <div className="chat-notice chat-notice-loading" role="status" aria-live="polite">
+                  <div className="chat-loading-seal" aria-hidden="true">
+                    <span />
+                  </div>
+                  <p>The scribes are preparing a reply.</p>
+                </div>
+              ) : null}
 
               <form className="chat-form" onSubmit={handleSubmit}>
                 <label className="sr-only" htmlFor="chat-input">
@@ -158,6 +192,7 @@ function ChatPage({
                   onChange={(event) => setDraft(event.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Write your inquiry..."
+                  disabled={isSending}
                 />
                 <div className="chat-form-actions">
                   <button className="chat-send-button" type="submit" disabled={isSending}>
@@ -205,6 +240,9 @@ function ChatPage({
 
         <section className="chat-mobile-dashboard">
           <header className="mobile-chat-header">
+            <button className="route-back-button mobile-back-button" type="button" onClick={onBack}>
+              Back
+            </button>
             <strong>The Citadel</strong>
             <button className="mobile-avatar" type="button" aria-label="Current house">
               {sigil}
@@ -224,10 +262,28 @@ function ChatPage({
               <h3>Your Response</h3>
               <span>Just now</span>
             </div>
-            <p>{messages.filter((message) => message.role === 'user').at(-1)?.content || 'Your next question will appear here.'}</p>
+            <p>{lastUserMessage?.content || 'Your next question will appear here.'}</p>
           </article>
 
-          {error ? <p className="chat-error mobile-error">{error}</p> : null}
+          {isSending ? (
+            <article className="mobile-card mobile-status-card" role="status" aria-live="polite">
+              <p className="mobile-status-kicker">Ink Drying</p>
+              <p>The Grand Maester is drafting his reply.</p>
+            </article>
+          ) : null}
+
+          {error ? (
+            <section className="chat-notice chat-notice-error mobile-error" role="alert" aria-live="assertive">
+              <div>
+                <p className="chat-notice-kicker">Raven Lost</p>
+                <h3>The message never reached the rookery.</h3>
+                <p className="chat-error">{error}</p>
+              </div>
+              <button type="button" className="chat-notice-button" onClick={onDismissError}>
+                Dismiss
+              </button>
+            </section>
+          ) : null}
 
           <form className="mobile-chat-form" onSubmit={handleSubmit}>
             <label className="sr-only" htmlFor="mobile-chat-input">
@@ -241,6 +297,7 @@ function ChatPage({
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Scribe a message..."
+              disabled={isSending}
             />
             <button className="chat-send-button" type="submit" disabled={isSending}>
               ➤

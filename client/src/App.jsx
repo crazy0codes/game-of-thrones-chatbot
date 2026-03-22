@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Home from './pages/Home.jsx'
 import ChoosePage from './pages/Choose.jsx'
 import ChatPage from './pages/chat.jsx'
@@ -50,12 +50,72 @@ const openingMessages = [
   },
 ]
 
+const routes = {
+  home: '/',
+  choose: '/choose',
+  chat: '/chat',
+}
+
+function getStageFromPath(pathname) {
+  if (pathname === routes.choose) {
+    return 'choose'
+  }
+
+  if (pathname === routes.chat) {
+    return 'chat'
+  }
+
+  return 'home'
+}
+
 function App() {
-  const [stage, setStage] = useState('home')
+  const [stage, setStage] = useState(() => getStageFromPath(window.location.pathname))
   const [selectedDiscipline, setSelectedDiscipline] = useState(disciplines[2])
   const [messages, setMessages] = useState(openingMessages)
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    const nextStage = getStageFromPath(window.location.pathname)
+
+    if (nextStage !== stage) {
+      setStage(nextStage)
+    }
+
+    if (window.location.pathname !== routes[nextStage]) {
+      window.history.replaceState({}, '', routes[nextStage])
+    }
+
+    function handlePopState() {
+      setStage(getStageFromPath(window.location.pathname))
+    }
+
+    window.addEventListener('popstate', handlePopState)
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [stage])
+
+  function navigateTo(nextStage, { replace = false } = {}) {
+    const nextPath = routes[nextStage] || routes.home
+
+    if (window.location.pathname !== nextPath) {
+      const method = replace ? 'replaceState' : 'pushState'
+      window.history[method]({}, '', nextPath)
+    }
+
+    setStage(nextStage)
+  }
+
+  function navigateBack(fallbackStage = 'home') {
+    if (window.history.length > 1) {
+      window.history.back()
+      return
+    }
+
+    navigateTo(fallbackStage, { replace: true })
+  }
 
   async function handleSendMessage(input) {
     const trimmed = input.trim()
@@ -108,11 +168,15 @@ function App() {
   }
 
   function handleEnterCitadel() {
-    setStage('choose')
+    navigateTo('choose')
   }
 
   function handleResetConversation() {
     setMessages(openingMessages)
+    setError('')
+  }
+
+  function handleDismissError() {
     setError('')
   }
 
@@ -127,7 +191,7 @@ function App() {
   }
 
   function handleBeginResearch() {
-    setStage('chat')
+    navigateTo('chat')
   }
 
   if (stage === 'home') {
@@ -138,6 +202,7 @@ function App() {
     return (
       <ChoosePage
         disciplines={disciplines}
+        onBack={() => navigateBack('home')}
         onBeginResearch={handleBeginResearch}
         onSelectDiscipline={handleSelectDiscipline}
         selectedDisciplineId={selectedDiscipline.id}
@@ -151,7 +216,9 @@ function App() {
       error={error}
       isSending={isSending}
       messages={messages}
-      onNewInquiry={() => setStage('choose')}
+      onBack={() => navigateBack('choose')}
+      onDismissError={handleDismissError}
+      onNewInquiry={() => navigateTo('choose')}
       onResetConversation={handleResetConversation}
       onSendMessage={handleSendMessage}
     />

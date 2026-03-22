@@ -7,6 +7,7 @@ const icons = {
 
 function ChoosePage({
   disciplines,
+  onBack,
   onBeginResearch,
   onSelectDiscipline,
   selectedDisciplineId,
@@ -14,6 +15,10 @@ function ChoosePage({
   return (
     <main className="choose-shell">
       <div className="choose-aura" aria-hidden="true" />
+
+      <button className="route-back-button choose-back-button" type="button" onClick={onBack}>
+        Back
+      </button>
 
       <section className="choose-hero">
         <p className="choose-kicker">The Citadel&apos;s Initiation</p>
