@@ -22,16 +22,6 @@ export function useSimpleRouter() {
   const [stage, setStage] = useState(() => getStageFromPath(window.location.pathname))
 
   useEffect(() => {
-    const nextStage = getStageFromPath(window.location.pathname)
-
-    if (nextStage !== stage) {
-      setStage(nextStage)
-    }
-
-    if (window.location.pathname !== routes[nextStage]) {
-      window.history.replaceState({}, '', routes[nextStage])
-    }
-
     function handlePopState() {
       setStage(getStageFromPath(window.location.pathname))
     }
@@ -41,17 +31,18 @@ export function useSimpleRouter() {
     return () => {
       window.removeEventListener('popstate', handlePopState)
     }
-  }, [stage])
+  }, [])
 
   function navigateTo(nextStage, { replace = false } = {}) {
-    const nextPath = routes[nextStage] || routes.home
+    const safeStage = routes[nextStage] ? nextStage : 'home'
+    const nextPath = routes[safeStage]
 
     if (window.location.pathname !== nextPath) {
       const method = replace ? 'replaceState' : 'pushState'
       window.history[method]({}, '', nextPath)
     }
 
-    setStage(nextStage)
+    setStage(safeStage)
   }
 
   function navigateBack(fallbackStage = 'home') {
