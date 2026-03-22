@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Baskervville:ital@0;1&display=swap');
+
+:root {
+  --paper: #f2e7d3;
+  --text-soft: #d2c2a7;
+  --muted: #ab9370;
+  --accent: #c49344;
+  --page-bg: #120d0a;
+  --font-body: 'Cormorant Garamond', Georgia, serif;
+  --font-display: 'Baskervville', Georgia, serif;
+  font-family: var(--font-body);
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--paper);
+  background: var(--page-bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--page-bg);
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--page-bg);
+  color: var(--paper);
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+button {
+  border-radius: 0;
+}
+
+code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  color: #f0d99f;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.06;
+  color: var(--paper);
+}
+
+h1 {
+  font-size: clamp(3rem, 7.2vw, 5.8rem);
+  margin: 0 0 18px;
+}
+
+h2 {
+  font-size: clamp(2rem, 4.6vw, 2.9rem);
+}
+
+h3 {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+}
+
+p {
+  font-size: 1.2rem;
+}
+
+#root {
+  min-height: 100vh;
+}
