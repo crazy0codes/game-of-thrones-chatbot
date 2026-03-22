@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Home from './pages/Home.jsx'
 import ChoosePage from './pages/Choose.jsx'
 import ChatPage from './pages/chat.jsx'
+import { useSimpleRouter } from './router.js'
 import './App.css'
 
 const apiBaseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
@@ -50,72 +51,12 @@ const openingMessages = [
   },
 ]
 
-const routes = {
-  home: '/',
-  choose: '/choose',
-  chat: '/chat',
-}
-
-function getStageFromPath(pathname) {
-  if (pathname === routes.choose) {
-    return 'choose'
-  }
-
-  if (pathname === routes.chat) {
-    return 'chat'
-  }
-
-  return 'home'
-}
-
 function App() {
-  const [stage, setStage] = useState(() => getStageFromPath(window.location.pathname))
+  const { stage, navigateBack, navigateTo } = useSimpleRouter()
   const [selectedDiscipline, setSelectedDiscipline] = useState(disciplines[2])
   const [messages, setMessages] = useState(openingMessages)
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState('')
-
-  useEffect(() => {
-    const nextStage = getStageFromPath(window.location.pathname)
-
-    if (nextStage !== stage) {
-      setStage(nextStage)
-    }
-
-    if (window.location.pathname !== routes[nextStage]) {
-      window.history.replaceState({}, '', routes[nextStage])
-    }
-
-    function handlePopState() {
-      setStage(getStageFromPath(window.location.pathname))
-    }
-
-    window.addEventListener('popstate', handlePopState)
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState)
-    }
-  }, [stage])
-
-  function navigateTo(nextStage, { replace = false } = {}) {
-    const nextPath = routes[nextStage] || routes.home
-
-    if (window.location.pathname !== nextPath) {
-      const method = replace ? 'replaceState' : 'pushState'
-      window.history[method]({}, '', nextPath)
-    }
-
-    setStage(nextStage)
-  }
-
-  function navigateBack(fallbackStage = 'home') {
-    if (window.history.length > 1) {
-      window.history.back()
-      return
-    }
-
-    navigateTo(fallbackStage, { replace: true })
-  }
 
   async function handleSendMessage(input) {
     const trimmed = input.trim()
