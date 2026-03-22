@@ -1,4 +1,8 @@
-require('dotenv').config()
+try {
+  require('dotenv').config()
+} catch (_error) {
+  // Render and similar platforms inject env vars directly in production.
+}
 
 const express = require('express')
 const fs = require('node:fs/promises')
