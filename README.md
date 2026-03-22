@@ -145,3 +145,20 @@ npm run dev
 - The backend now loads values from `backend/.env`
 - The prompt is read from `client/prompt.md`
 - The backend currently limits replies to short outputs to match the character style
+
+## Render deployment
+
+This repo now includes a `render.yaml` for the backend service.
+
+Important settings:
+
+- root directory: `backend`
+- build command: `npm install && npm run build`
+- start command: `npm start`
+
+In Render, add:
+
+- `GEMINI_API_KEY`
+- `GEMINI_MODEL` optional
+
+If you already created the service manually, redeploy after syncing the latest `main` branch and confirm the service is using the `backend` root directory.
